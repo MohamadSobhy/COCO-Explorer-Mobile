@@ -21,7 +21,7 @@ class CocoImage extends Equatable {
 
 class ImageSegmentation extends Equatable {
   final int categoryId;
-  final List<int> points;
+  final List<num> points;
 
   const ImageSegmentation({required this.categoryId, required this.points});
 

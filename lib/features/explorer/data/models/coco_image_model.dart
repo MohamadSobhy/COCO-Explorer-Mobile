@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 import '../../domain/entities/coco_image.dart';
 
 class CocoImageModel extends CocoImage {
@@ -39,12 +41,20 @@ class ImageSegmentationModel extends ImageSegmentation {
   }) : super(categoryId: categoryId, points: points);
 
   factory ImageSegmentationModel.fromJson(Map<String, dynamic> parsedJson) {
+    debugPrint(parsedJson['segmentation']);
+
     return ImageSegmentationModel(
       categoryId: parsedJson['category_id'],
-      points: List<num>.from(
-        (json.decode(parsedJson['segmentation'] ?? "[[]]") as List<dynamic>)
-            .first,
-      ),
+      points: json.decode(parsedJson['segmentation'] ?? "[[]]") is List
+          ? List<num>.from(
+              (json.decode(parsedJson['segmentation'] ?? "[[]]")
+                      as List<dynamic>)
+                  .first,
+            )
+          : List<num>.from(
+              json.decode(
+                  parsedJson['segmentation'] ?? "{counts: []}")['counts'],
+            ),
     );
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import '../../../../core/api_handler/api_base_handler.dart';
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/errors/errors.dart';
@@ -7,7 +5,10 @@ import '../../../../core/network/network_info.dart';
 import '../models/coco_search_result_model.dart';
 
 abstract class CocoSearchRemoteDataSource {
-  Future<CocoSearchResultModel> searchCocoDataset(List<int> categoryIds);
+  Future<CocoSearchResultModel> searchCocoDataset(
+    List<int> categoryIds, {
+    int page = 1,
+  });
 }
 
 class CocoSearchRemoteDataSourceImpl implements CocoSearchRemoteDataSource {
@@ -19,20 +20,53 @@ class CocoSearchRemoteDataSourceImpl implements CocoSearchRemoteDataSource {
     required this.networkInfo,
   });
 
+  List<int> _fetchedImagesIds = [];
+
   @override
-  Future<CocoSearchResultModel> searchCocoDataset(List<int> categoryIds) async {
+  Future<CocoSearchResultModel> searchCocoDataset(
+    List<int> categoryIds, {
+    int page = 1,
+  }) async {
     if (await networkInfo.isConnected) {
-      final imagesIdsJson = await _fetchImagesByCategories(categoryIds) ?? [];
+      List<int> imagesToBeLoaded = [];
 
-      final imagesIds = List<int>.from(imagesIdsJson as List<dynamic>);
+      if (page == 1) {
+        final imagesIdsJson = await _fetchImagesByCategories(categoryIds) ?? [];
 
-      final result = await Future.wait([
-        _fetchImagesDetails(imagesIds),
-        _fetchImagesSegmentations(imagesIds),
-        _fetchImagesCaptions(imagesIds),
-      ]);
+        _fetchedImagesIds = List<int>.from(imagesIdsJson as List<dynamic>);
+        if (_fetchedImagesIds.length >= 5) {
+          imagesToBeLoaded = _fetchedImagesIds.sublist(0, 5);
+        } else {
+          imagesToBeLoaded = _fetchedImagesIds;
+        }
+      } else {
+        if (_fetchedImagesIds.length >= page * 5) {
+          imagesToBeLoaded =
+              _fetchedImagesIds.sublist((page - 1) * 5, page * 5);
+        } else {
+          imagesToBeLoaded = _fetchedImagesIds.sublist(
+            (page - 1) * 5,
+            _fetchedImagesIds.length,
+          );
+        }
+      }
 
-      return CocoSearchResultModel.fromJson(result[0], result[1], result[2]);
+      late List result = [[], [], []];
+
+      if (imagesToBeLoaded.isNotEmpty) {
+        result = await Future.wait([
+          _fetchImagesDetails(imagesToBeLoaded),
+          _fetchImagesSegmentations(imagesToBeLoaded),
+          _fetchImagesCaptions(imagesToBeLoaded),
+        ]);
+      }
+
+      return CocoSearchResultModel.fromJson(
+        result[0],
+        result[1],
+        result[1],
+        total: _fetchedImagesIds.length,
+      );
     } else {
       throw NetworkException(
         message: 'please check your internet connectionand try again.',
@@ -43,31 +77,28 @@ class CocoSearchRemoteDataSourceImpl implements CocoSearchRemoteDataSource {
   Future _fetchImagesByCategories(List<int> categoryIds) {
     return apiHandler.post(
       ApiEndpoints.cocoDatasetEndpointUrl,
-      body: {
-        "category_ids": json.encode(categoryIds),
-        "querytype": "getImagesByCats"
-      },
+      body: {"category_ids": categoryIds, "querytype": "getImagesByCats"},
     );
   }
 
   Future _fetchImagesDetails(List<int> imagesIds) {
     return apiHandler.post(
       ApiEndpoints.cocoDatasetEndpointUrl,
-      body: {"image_ids": json.encode(imagesIds), "querytype": "getImages"},
+      body: {"image_ids": imagesIds, "querytype": "getImages"},
     );
   }
 
   Future _fetchImagesSegmentations(List<int> imagesIds) {
     return apiHandler.post(
       ApiEndpoints.cocoDatasetEndpointUrl,
-      body: {"image_ids": json.encode(imagesIds), "querytype": "getInstances"},
+      body: {"image_ids": imagesIds, "querytype": "getInstances"},
     );
   }
 
   Future _fetchImagesCaptions(List<int> imagesIds) {
     return apiHandler.post(
       ApiEndpoints.cocoDatasetEndpointUrl,
-      body: {"image_ids": json.encode(imagesIds), "querytype": "getCaptions"},
+      body: {"image_ids": imagesIds, "querytype": "getCaptions"},
     );
   }
 }
