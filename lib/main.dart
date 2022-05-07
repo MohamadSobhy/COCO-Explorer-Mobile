@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import 'features/explorer/presentation/pages/home_page.dart';
+import 'features/explorer/presentation/bloc/explorer_bloc.dart';
+import 'features/explorer/presentation/pages/coco_explorer_page.dart';
 import 'features/explorer/presentation/providers/search_tags_provider.dart';
 import 'injection_container.dart';
 
@@ -16,16 +18,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
+    return MultiBlocProvider(
       providers: [
-        ChangeNotifierProvider.value(value: servLocator<SearchTagsProvider>()),
+        BlocProvider.value(value: servLocator<ExplorerBloc>()),
       ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(
+            value: servLocator<SearchTagsProvider>(),
+          ),
+        ],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: CocoExplorerPage(),
         ),
-        home: MyHomePage(),
       ),
     );
   }
