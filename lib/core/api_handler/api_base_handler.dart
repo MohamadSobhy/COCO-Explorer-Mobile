@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 
@@ -14,7 +15,20 @@ abstract class ApiHandler {
 class SimpleApiHandler implements ApiHandler {
   @override
   Future post(String url, {Map<String, dynamic> body = const {}}) async {
-    final response = await http.post(Uri.parse(url), body: body);
+    log(url, name: 'URL');
+    log(body.toString(), name: 'BODY');
+
+    final response = await http.post(
+      Uri.parse(url),
+      body: jsonEncode(body),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+
+    log(response.statusCode.toString(), name: 'STATUS_CODE');
+    print(response.body);
 
     if (response.statusCode == 200) {
       return json.decode(utf8.decode(response.bodyBytes));

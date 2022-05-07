@@ -4,13 +4,15 @@ import 'coco_image_model.dart';
 class CocoSearchResultModel extends CocoSearchResult {
   const CocoSearchResultModel({
     required List<CocoImageModel> images,
-  }) : super(images: images);
+    required int total,
+  }) : super(images: images, total: total);
 
   factory CocoSearchResultModel.fromJson(
     List<dynamic> imagesJson,
     List<dynamic> segmentationJson,
-    List<dynamic> captionsJson,
-  ) {
+    List<dynamic> captionsJson, {
+    int total = 5,
+  }) {
     List<CocoImageModel> parsedImages = [];
 
     for (final image in imagesJson) {
@@ -27,7 +29,10 @@ class CocoSearchResultModel extends CocoSearchResult {
       parsedImages.add(CocoImageModel.fromJson(image, segmentations, captions));
     }
 
-    return CocoSearchResultModel(images: parsedImages);
+    return CocoSearchResultModel(
+      images: parsedImages,
+      total: total,
+    );
   }
 
   @override
