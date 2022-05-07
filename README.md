@@ -4,9 +4,9 @@
 
 ## Cloning the repo
 - From GitHub:
- - Download or clone the Repo from [GitHub](https://github.com/MohamadSobhy/COCO-Explorer-Mobile.git)
+    - Download or clone the Repo from [GitHub](https://github.com/MohamadSobhy/COCO-Explorer-Mobile.git)
 - From `coco_explorer_mobile_git_pck` file
- - Use the command `git clone coco_explorer_mobile_git_pck git clone coco_explorer_mobile` to clone the repo from the binary file.
+    - Use the command `git clone coco_explorer_mobile_git_pck git clone coco_explorer_mobile` to clone the repo from the binary file.
 
 ## Intaillation:
 
