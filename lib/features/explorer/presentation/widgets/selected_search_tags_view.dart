@@ -13,8 +13,28 @@ class SelectedSearchTagsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SearchTagsProvider>(
       builder: (ctx, provider, child) {
-        return Wrap(
-          children: provider.searchTags.map((e) => SearchTag(tag: e)).toList(),
+        return Container(
+          constraints: const BoxConstraints(
+            maxHeight: 120,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.purple.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Scrollbar(
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              padding: provider.searchTags.isEmpty
+                  ? EdgeInsets.zero
+                  : const EdgeInsets.all(8),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children:
+                    provider.searchTags.map((e) => SearchTag(tag: e)).toList(),
+              ),
+            ),
+          ),
         );
       },
     );
