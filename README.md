@@ -8,7 +8,7 @@
 - From `coco_explorer_mobile_git_pck` file
     - Use the command `git clone coco_explorer_mobile_git_pck git clone coco_explorer_mobile` to clone the repo from the binary file.
 
-## Intaillation:
+## Installation:
 
 - Open the project `coco_explorer_mobile` from Vcode or Android Studio
 - Run `flutter clean` command to clean the project.
