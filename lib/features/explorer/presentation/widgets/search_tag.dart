@@ -17,7 +17,6 @@ class SearchTag extends StatelessWidget {
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 7),
-        margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: Colors.pink.withOpacity(0.15),
           borderRadius: BorderRadius.circular(4),
